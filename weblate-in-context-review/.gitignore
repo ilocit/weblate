@@ -1,0 +1,6 @@
+addon/.venv/
+gateway/.venv/
+react/dist/
+react/node_modules/
+react/.vite-config/
+react/*.tsbuildinfo

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["uv_build>=0.8.18,<0.9.0"]
+build-backend = "uv_build"
+
+[project]
+name = "weblate-in-context-review-addon"
+version = "0.1.0"
+description = "Optional Weblate add-on for in-context review bindings"
+requires-python = ">=3.13"
+license = "GPL-3.0-or-later"
+
+[dependency-groups]
+dev = ["pytest>=8.4"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.uv.build-backend]
+module-name = "weblate_in_context_addon"
