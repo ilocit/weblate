@@ -84,12 +84,17 @@ input {
   border-left: 1px solid #d8dfdb;
 }
 
-.app-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 25rem);
-  gap: clamp(1.5rem, 4vw, 4rem);
+.page-content,
+.alert-region {
   width: min(75rem, calc(100% - 2rem));
   margin-inline: auto;
+}
+
+.alert-region {
+  padding-top: 1rem;
+}
+
+.page-content {
   padding-block: clamp(2rem, 6vw, 5rem);
 }
 
@@ -185,32 +190,35 @@ input {
   cursor: pointer;
 }
 
+.settings-page {
+  width: min(40rem, 100%);
+}
+
+.settings-page > header {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  color: #153d35;
+}
+
+.settings-page > header svg {
+  width: 1.5rem;
+  color: #007a5e;
+}
+
+.settings-page h1 {
+  margin: 0;
+  font-family: "Newsreader", serif;
+  font-size: 2.4rem;
+}
+
 .settings-panel {
-  align-self: start;
   padding: 1.25rem;
   border: 1px solid #bdc8c2;
   border-radius: 6px;
   background: #fff;
   box-shadow: 0 12px 30px rgb(23 33 43 / 10%);
-}
-
-.settings-panel header {
-  display: flex;
-  gap: 0.7rem;
-  align-items: center;
-  margin: -1.25rem -1.25rem 1.25rem;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #d8dfdb;
-}
-
-.settings-panel header svg {
-  width: 1.2rem;
-  color: #007a5e;
-}
-
-.settings-panel h2 {
-  margin: 0;
-  font-size: 1rem;
 }
 
 .settings-panel > label:not(.toggle-row) {
@@ -286,10 +294,6 @@ input {
   .account-action {
     margin-left: auto;
     border-left: 0;
-  }
-
-  .app-layout {
-    grid-template-columns: 1fr;
   }
 
   .settings-panel {

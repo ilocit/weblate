@@ -2,26 +2,14 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { expect, test } from "vitest";
 import App from "./App";
 
-test("uses every Weblate string in the application workflow", () => {
+test("renders Home and Settings as separate pages", () => {
+  window.location.hash = "#home";
   render(<App />);
 
-  const initialKeys = new Set(
-    Array.from(document.querySelectorAll("[data-l10n-key]"), (element) =>
-      element.getAttribute("data-l10n-key"),
-    ),
-  );
-  expect(initialKeys).toEqual(
-    new Set([
-      "account.sign_out",
-      "app.name",
-      "button.cancel",
-      "button.save",
-      "error.network",
-      "items.count",
-      "navigation.home",
-      "navigation.settings",
-      "welcome.message",
-    ]),
+  expect(screen.getByRole("heading", { name: "Willkommen, Mara!" })).toBeVisible();
+  expect(screen.queryByLabelText("Display name")).not.toBeInTheDocument();
+  expect(screen.getByRole("alert")).toHaveTextContent(
+    "Verbindung konnte nicht hergestellt werden. Bitte versuchen Sie es erneut.",
   );
 
   fireEvent.click(screen.getByRole("button", { name: /Abmelden/ }));
@@ -30,9 +18,29 @@ test("uses every Weblate string in the application workflow", () => {
   fireEvent.click(screen.getByRole("button", { name: "Increase item count" }));
   expect(screen.getByText("Sie haben 5 Elemente.")).toBeInTheDocument();
 
+  fireEvent.click(screen.getByRole("link", { name: /Einstellungen/ }));
+  expect(screen.getByRole("heading", { name: "Einstellungen" })).toBeVisible();
+  expect(screen.queryByText("Willkommen, Mara!")).not.toBeInTheDocument();
+
   const nameInput = screen.getByLabelText("Display name");
   fireEvent.change(nameInput, { target: { value: "Jonas" } });
-  expect(screen.getByText("Willkommen, Jonas!")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
   expect(nameInput).toHaveValue("Mara");
+
+  const visibleKeys = new Set(
+    Array.from(document.querySelectorAll("[data-l10n-key]"), (element) =>
+      element.getAttribute("data-l10n-key"),
+    ),
+  );
+  expect(visibleKeys).toEqual(
+    new Set([
+      "account.sign_in",
+      "app.name",
+      "button.cancel",
+      "button.save",
+      "error.network",
+      "navigation.home",
+      "navigation.settings",
+    ]),
+  );
 });

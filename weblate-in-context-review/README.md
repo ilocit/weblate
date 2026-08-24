@@ -30,11 +30,28 @@ prototype's configured review token is suitable only for local development.
 
 ## Weblate add-on
 
-Install the package into the same Python environment as Weblate:
+The add-on requires Python 3.13 or newer and must be installed into the same
+Python environment as Weblate. For a native Weblate installation with `uv`
+available, run from the repository root:
 
 ```console
 uv pip install -e ./weblate-in-context-review/addon
 ```
+
+For this repository's Docker development environment, use the Python and `uv`
+already included in the Weblate container. The source directory is bind-mounted
+at `/app/src`, so no host installation of `uv` is needed:
+
+```console
+cd dev-docker
+docker compose exec weblate uv pip install --system \
+  -e /app/src/weblate-in-context-review/addon
+```
+
+For another containerized Weblate instance, build a custom image that copies
+the add-on source or wheel and installs it during the image build. Do not rely
+on installing it interactively into a running production container, because
+that change disappears when the container is replaced.
 
 Register the add-on in the Weblate settings override:
 

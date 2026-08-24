@@ -7,7 +7,7 @@ import {
   Plus,
   Settings,
 } from "lucide-react";
-import { type PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useEffect, useState } from "react";
 import { L10nOccurrence, ReviewProvider } from "./ReviewContext";
 import { ReviewOverlay } from "./ReviewOverlay";
 import "./demo.css";
@@ -49,7 +49,14 @@ function Localized({
   );
 }
 
+type Page = "home" | "settings";
+
+function getPage(): Page {
+  return window.location.hash === "#settings" ? "settings" : "home";
+}
+
 export default function App() {
+  const [page, setPage] = useState(getPage);
   const [signedIn, setSignedIn] = useState(true);
   const [itemCount, setItemCount] = useState(4);
   const [showNetworkError, setShowNetworkError] = useState(true);
@@ -59,6 +66,12 @@ export default function App() {
   const cancelChanges = () => setFormValues(savedValues);
   const saveChanges = () => setSavedValues(formValues);
 
+  useEffect(() => {
+    const updatePage = () => setPage(getPage());
+    window.addEventListener("hashchange", updatePage);
+    return () => window.removeEventListener("hashchange", updatePage);
+  }, []);
+
   return (
     <ReviewProvider gatewayUrl="http://localhost:8090" reviewToken="review-token">
       <main className="demo-shell">
@@ -66,11 +79,19 @@ export default function App() {
           <strong>
             <Localized context="app.name" />
           </strong>
-          <a href="#home" className="active">
+          <a
+            href="#home"
+            className={page === "home" ? "active" : undefined}
+            onClick={() => setPage("home")}
+          >
             <Home aria-hidden="true" />
             <Localized context="navigation.home" />
           </a>
-          <a href="#settings">
+          <a
+            href="#settings"
+            className={page === "settings" ? "active" : undefined}
+            onClick={() => setPage("settings")}
+          >
             <Settings aria-hidden="true" />
             <Localized context="navigation.settings" />
           </a>
@@ -83,11 +104,28 @@ export default function App() {
           </button>
         </nav>
 
-        <div className="app-layout">
-          <section id="home" className="overview">
+        {showNetworkError && (
+          <div className="alert-region">
+            <div className="network-alert" role="alert">
+              <CloudOff aria-hidden="true" />
+              <Localized context="error.network" />
+              <button
+                onClick={() => setShowNetworkError(false)}
+                aria-label="Dismiss network error"
+                title="Dismiss"
+              >
+                &times;
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="page-content">
+          {page === "home" && (
+            <section className="overview" aria-labelledby="welcome-heading">
             <div className="intro">
               <p className="demo-eyebrow">Localization workspace</p>
-              <h1>
+              <h1 id="welcome-heading">
                 <Localized context="welcome.message">
                   {format(translations["welcome.message"], formValues.name)}
                 </Localized>
@@ -115,63 +153,54 @@ export default function App() {
                 </button>
               </div>
             </div>
-
-            {showNetworkError && (
-              <div className="network-alert" role="alert">
-                <CloudOff aria-hidden="true" />
-                <Localized context="error.network" />
-                <button
-                  onClick={() => setShowNetworkError(false)}
-                  aria-label="Dismiss network error"
-                  title="Dismiss"
-                >
-                  &times;
-                </button>
-              </div>
-            )}
           </section>
+          )}
 
-          <section id="settings" className="settings-panel">
+          {page === "settings" && (
+          <section className="settings-page" aria-labelledby="settings-heading">
             <header>
               <Settings aria-hidden="true" />
-              <h2>
+              <h1 id="settings-heading">
                 <Localized context="navigation.settings" />
-              </h2>
+              </h1>
             </header>
-            <label>
-              Display name
-              <input
-                value={formValues.name}
-                onChange={(event) =>
-                  setFormValues((current) => ({
-                    ...current,
-                    name: event.target.value,
-                  }))
-                }
-              />
-            </label>
-            <label className="toggle-row">
-              <input
-                type="checkbox"
-                checked={formValues.digest}
-                onChange={(event) =>
-                  setFormValues((current) => ({
-                    ...current,
-                    digest: event.target.checked,
-                  }))
-                }
-              />
-              Weekly activity digest
-            </label>
-            <div className="form-actions">
-              <button className="secondary" onClick={cancelChanges}>
-                <Localized context="button.cancel" />
-              </button>
-              <button className="primary" onClick={saveChanges}>
-                <Localized context="button.save" />
-              </button>
+            <div className="settings-panel">
+              <label>
+                Display name
+                <input
+                  value={formValues.name}
+                  onChange={(event) =>
+                    setFormValues((current) => ({
+                      ...current,
+                      name: event.target.value,
+                    }))
+                  }
+                />
+              </label>
+              <label className="toggle-row">
+                <input
+                  type="checkbox"
+                  checked={formValues.digest}
+                  onChange={(event) =>
+                    setFormValues((current) => ({
+                      ...current,
+                      digest: event.target.checked,
+                    }))
+                  }
+                />
+                Weekly activity digest
+              </label>
+              <div className="form-actions">
+                <button className="secondary" onClick={cancelChanges}>
+                  <Localized context="button.cancel" />
+                </button>
+                <button className="primary" onClick={saveChanges}>
+                  <Localized context="button.save" />
+                </button>
+              </div>
             </div>
           </section>
+          )}
         </div>
       </main>
       <ReviewOverlay />
